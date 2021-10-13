@@ -30,8 +30,8 @@ export default async function (req, res) {
       const rowData = {}
       row.forEach((item, index) => {
         rowData[headers[index]] = item
-        rows.push(rowData)
       })
+      rows.push(rowData)
     })
 
     // Cache rows for 30 seconds.
