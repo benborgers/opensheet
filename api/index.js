@@ -10,6 +10,9 @@ const sheets = google.sheets({ version: 'v4', auth })
 export default async function (req, res) {
   const { id, sheet } = req.query
 
+  // Allow any other website to access this API.
+  res.setHeader('Access-Control-Allow-Origin', '*')
+
   sheets.spreadsheets.values.get({
     spreadsheetId: id,
     range: sheet
@@ -31,6 +34,8 @@ export default async function (req, res) {
       })
     })
 
+    // Cache rows for 30 seconds.
+    res.setHeader('Cache-Control', 's-maxage=30')
     return res.json(rows)
   })
 }
