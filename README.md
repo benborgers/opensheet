@@ -2,6 +2,6 @@
 
 A free API for getting Google Sheets as JSON.
 
-Documentation: https://benborgers.com/posts/google-sheets-json
+**Documentation:** [benborgers.com/posts/google-sheets-json](https://benborgers.com/posts/google-sheets-json)
 
-If you have questions: https://benborgers.com/contact
+**If you have questions:** [benborgers.com/contact](https://benborgers.com/contact)
