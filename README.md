@@ -1,3 +1,7 @@
 # opensheet
 
-Documentation coming soon! In the meantime, email me with questions: ben@elk.sh
+A free API for getting Google Sheets as JSON.
+
+Documentation: https://benborgers.com/posts/google-sheets-json
+
+If you have questions: https://benborgers.com/contact

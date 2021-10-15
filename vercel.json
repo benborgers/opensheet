@@ -1,4 +1,7 @@
 {
+  "redirects": [
+    { "source": "/", "destination": "https://benborgers.com/posts/google-sheets-json" }
+  ],
   "rewrites": [
     { "source": "/:id/:sheet", "destination": "/api/index" }
   ]
