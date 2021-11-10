@@ -2,9 +2,33 @@
 
 A free API for getting Google Sheets as JSON.
 
-**Documentation blog post:** [benborgers.com/posts/google-sheets-json](https://benborgers.com/posts/google-sheets-json)
+**Tutorial blog post:** [benborgers.com/posts/google-sheets-json](https://benborgers.com/posts/google-sheets-json)
 
 **If you have questions:** [benborgers.com/contact](https://benborgers.com/contact)
+
+## Documentation
+
+This API returns a given Google Sheet’s rows as JSON data. In order to use it, the first column of your Google Sheet should be column headers. [Here’s an example](https://docs.google.com/spreadsheets/d/1o5t26He2DzTweYeleXOGiDjlU4Jkx896f95VUHVgS8U/edit).
+
+The format for this API is:
+
+```
+https://opensheet.vercel.app/spreadsheet_id/sheet_name
+```
+
+For example:
+
+```
+https://opensheet.vercel.app/1o5t26He2DzTweYeleXOGiDjlU4Jkx896f95VUHVgS8U/Test+Sheet
+```
+
+You can also replace `sheet_name` with the sheet number (in the order that the tabs are arranged), if you don’t know the name. For example, to get the first sheet:
+
+```
+https://opensheet.vercel.app/1o5t26He2DzTweYeleXOGiDjlU4Jkx896f95VUHVgS8U/1
+```
+
+_Take note that the first sheet in order is numbered `1`, not `0`._
 
 ## Self-hosting
 

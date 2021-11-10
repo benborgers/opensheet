@@ -8,10 +8,28 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: 'v4', auth })
 
 export default async function (req, res) {
-  const { id, sheet } = req.query
+  let { id, sheet } = req.query
 
   // Allow any other website to access this API.
   res.setHeader('Access-Control-Allow-Origin', '*')
+
+  if (! isNaN(sheet)) {
+    const { data } = await sheets.spreadsheets.get({
+      spreadsheetId: id
+    })
+
+    if (parseInt(sheet) === 0) {
+      return res.json({ error: 'For this API, sheet numbers start at 1' })
+    }
+
+    const sheetIndex = parseInt(sheet) - 1
+
+    if (!data.sheets[sheetIndex]) {
+      return res.json({ error: `There is no sheet number ${sheet}` })
+    }
+
+    sheet = data.sheets[sheetIndex].properties.title
+  }
 
   sheets.spreadsheets.values.get({
     spreadsheetId: id,
