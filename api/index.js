@@ -1,3 +1,4 @@
+import { extname } from "path"
 import { google } from 'googleapis'
 
 const auth = new google.auth.GoogleAuth({
@@ -7,8 +8,47 @@ const auth = new google.auth.GoogleAuth({
 
 const sheets = google.sheets({ version: 'v4', auth })
 
+// A map of response handler based on requested format.
+const responders = {
+  ".json": function(res, { error, rows }) {
+    if (error) {
+      return res.json({ error })
+    }
+
+    return res.json(rows)
+  },
+  ".xml": function(res, { error, id, sheet, rows }) {
+    res.setHeader('Content-Type', 'text/xml')
+
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+
+    if (error) {
+      xml += `<error>${error}</error>`
+    } else {
+      const rowName = sheet.replace(/\s/g, '')
+      xml += `<spreadsheet id="${id}">\n`
+      rows.forEach(row => {
+        xml += `<${rowName}>\n`
+        Object.keys(row).forEach(header => {
+          const headerName = header.replace(/\s/g, '')
+          xml += `<${headerName}>${row[header]}</${headerName}>\n`
+        })
+        xml += `</${rowName}>\n`
+      })
+      xml += '</spreadsheet>'
+    }
+
+    return res.send(xml)
+  }
+}
+
 export default async function (req, res) {
   let { id, sheet } = req.query
+
+  const format = extname(sheet) || '.json'
+  sheet = sheet.replace(format, '')
+
+  const responder = responders[format]
 
   // Allow any other website to access this API.
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -19,13 +59,13 @@ export default async function (req, res) {
     })
 
     if (parseInt(sheet) === 0) {
-      return res.json({ error: 'For this API, sheet numbers start at 1' })
+      return responder(res, { error: 'For this API, sheet numbers start at 1' })
     }
 
     const sheetIndex = parseInt(sheet) - 1
 
     if (!data.sheets[sheetIndex]) {
-      return res.json({ error: `There is no sheet number ${sheet}` })
+      return responder(res, { error: `There is no sheet number ${sheet}` })
     }
 
     sheet = data.sheets[sheetIndex].properties.title
@@ -35,8 +75,8 @@ export default async function (req, res) {
     spreadsheetId: id,
     range: sheet
   }, (error, result) => {
-    if(error) {
-      return res.json({ error: error.response.data.error.message })
+    if (error) {
+      return responder(res, { error: error.response.data.error.message })
     }
 
     const rows = []
@@ -54,6 +94,10 @@ export default async function (req, res) {
 
     // Cache rows for 30 seconds.
     res.setHeader('Cache-Control', 's-maxage=30')
-    return res.json(rows)
+    return responder(res, {
+      id,
+      sheet,
+      rows,
+    })
   })
 }
