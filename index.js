@@ -12,6 +12,13 @@ const auth = new google.auth.GoogleAuth({
 });
 const sheets = google.sheets({ version: "v4", auth });
 
+const { createClient } = require("redis");
+let redis = createClient({ url: process.env.REDIS_URL });
+(async () => {
+  await redis.connect();
+  console.log("Connected to Redis");
+})();
+
 app.use(require("morgan")("tiny"));
 
 app.use("*", (req, res, next) => {
@@ -39,6 +46,12 @@ app.get("/:id/:sheet", async (req, res) => {
   // even after migrating off of Vercel so there's no breaking change.
   sheet = sheet.replace(/\+/g, " ");
 
+  const cacheKey = `${id}--${sheet}`;
+  if (await redis.exists(cacheKey)) {
+    console.log(`Cache hit for ${cacheKey}`);
+    return res.json(JSON.parse(await redis.get(cacheKey)));
+  }
+
   if (!isNaN(sheet)) {
     const { data } = await sheets.spreadsheets.get({
       spreadsheetId: id,
@@ -62,7 +75,7 @@ app.get("/:id/:sheet", async (req, res) => {
       spreadsheetId: id,
       range: sheet,
     },
-    (error, result) => {
+    async (error, result) => {
       if (error) {
         return res.json({ error: error.response.data.error.message });
       }
@@ -79,6 +92,13 @@ app.get("/:id/:sheet", async (req, res) => {
         });
         rows.push(rowData);
       });
+
+      await redis.set(cacheKey, JSON.stringify(rows), {
+        EX: 30, // Cache for 30 seconds
+      });
+      console.log(
+        `Cache miss for ${cacheKey}, refetched and stored for 30 seconds`
+      );
 
       return res.json(rows);
     }
