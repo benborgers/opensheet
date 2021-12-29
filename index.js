@@ -22,6 +22,9 @@ app.get("/", (req, res) => {
 
 app.get("/:id/:sheet", async (req, res) => {
   let { id, sheet } = req.params;
+  // This is what Vercel does, and we want to keep this behavior
+  // even after migrating off of Vercel so there's no breaking change.
+  sheet = sheet.replace(/\+/g, " ");
 
   if (!isNaN(sheet)) {
     const { data } = await sheets.spreadsheets.get({
