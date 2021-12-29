@@ -1,8 +1,11 @@
 {
   "redirects": [
-    { "source": "/", "destination": "https://benborgers.com/posts/google-sheets-json" }
+    { "source": "/(.*)", "destination": "https://opensheet.elk.sh/$1" }
   ],
-  "rewrites": [
-    { "source": "/:id/:sheet", "destination": "/api/index" }
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [{ "key": "Access-Control-Allow-Origin", "value": "*" }]
+    }
   ]
 }
