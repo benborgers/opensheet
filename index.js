@@ -29,7 +29,9 @@ let redis = {
   }
 })();
 
-app.use(require("morgan")("tiny"));
+app.use(
+  require("morgan")(":method :url :status - :response-time ms (via :referrer)")
+);
 app.use(require("cors")());
 
 app.get("/", async (req, res) => {
