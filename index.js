@@ -13,10 +13,20 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: "v4", auth });
 
 const { createClient } = require("redis");
-let redis = createClient({ url: process.env.REDIS_URL });
+let redis = {
+  exists: () => false,
+  set: () => null,
+};
 (async () => {
-  await redis.connect();
-  console.log("Connected to Redis");
+  if (process.env.REDIS_URL) {
+    redis = createClient({ url: process.env.REDIS_URL });
+    await redis.connect();
+    console.log("Connected to Redis");
+  } else {
+    console.log(
+      "No Redis URL found (no process.env.REDIS_URL), so no caching will be done"
+    );
+  }
 })();
 
 app.use(require("morgan")("tiny"));
