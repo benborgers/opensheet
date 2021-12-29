@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "railway run nodemon npm start",
     "start": "node index.js"
   },
   "keywords": [],
@@ -12,5 +13,8 @@
   "dependencies": {
     "express": "^4.17.2",
     "googleapis": "^88.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
   }
 }
