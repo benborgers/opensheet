@@ -30,11 +30,7 @@ let redis = {
 })();
 
 app.use(require("morgan")("tiny"));
-
-app.use("*", (req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  next();
-});
+app.use(require("cors")());
 
 app.get("/", async (req, res) => {
   let html = fs.readFileSync("./index.html", "utf-8");
