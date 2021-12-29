@@ -60,9 +60,15 @@ app.get("/:id/:sheet", async (req, res) => {
   }
 
   if (!isNaN(sheet)) {
-    const { data } = await sheets.spreadsheets.get({
-      spreadsheetId: id,
-    });
+    let data;
+    try {
+      const response = await sheets.spreadsheets.get({
+        spreadsheetId: id,
+      });
+      data = response.data;
+    } catch (error) {
+      return res.json({ error: error.response.data.error.message });
+    }
 
     if (parseInt(sheet) === 0) {
       return res.json({ error: "For this API, sheet numbers start at 1" });
