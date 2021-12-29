@@ -1,9 +1,5 @@
 const express = require("express");
 const app = express();
-const fs = require("fs");
-const fetch = require("node-fetch");
-const MarkdownIt = require("markdown-it");
-const md = new MarkdownIt();
 
 const { google } = require("googleapis");
 const auth = new google.auth.GoogleAuth({
@@ -35,17 +31,7 @@ app.use(
 app.use(require("cors")());
 
 app.get("/", async (req, res) => {
-  let html = fs.readFileSync("./index.html", "utf-8");
-
-  const readme = await (
-    await fetch(
-      "https://raw.githubusercontent.com/benborgers/opensheet/main/README.md"
-    )
-  ).text();
-
-  html = html.replace("README_HTML", md.render(readme));
-
-  return res.send(html);
+  res.redirect("https://github.com/benborgers/opensheet#readme");
 });
 
 app.get("/:id/:sheet", async (req, res) => {
