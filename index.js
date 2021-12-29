@@ -20,8 +20,53 @@ app.get("/", (req, res) => {
   res.send("todo");
 });
 
-app.get("/:id/:sheet", (req, res) => {
-  res.send("hi");
+app.get("/:id/:sheet", async (req, res) => {
+  let { id, sheet } = req.params;
+
+  if (!isNaN(sheet)) {
+    const { data } = await sheets.spreadsheets.get({
+      spreadsheetId: id,
+    });
+
+    if (parseInt(sheet) === 0) {
+      return res.json({ error: "For this API, sheet numbers start at 1" });
+    }
+
+    const sheetIndex = parseInt(sheet) - 1;
+
+    if (!data.sheets[sheetIndex]) {
+      return res.json({ error: `There is no sheet number ${sheet}` });
+    }
+
+    sheet = data.sheets[sheetIndex].properties.title;
+  }
+
+  sheets.spreadsheets.values.get(
+    {
+      spreadsheetId: id,
+      range: sheet,
+    },
+    (error, result) => {
+      if (error) {
+        return res.json({ error: error.response.data.error.message });
+      }
+
+      const rows = [];
+
+      const rawRows = result.data.values;
+      const headers = rawRows.shift();
+
+      rawRows.forEach((row) => {
+        const rowData = {};
+        row.forEach((item, index) => {
+          rowData[headers[index]] = item;
+        });
+        rows.push(rowData);
+      });
+
+      return res.json(rows);
+    }
+  );
 });
 
 app.listen(3000, () => {
