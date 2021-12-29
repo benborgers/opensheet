@@ -1,11 +1,3 @@
 {
-  "redirects": [
-    { "source": "/(.*)", "destination": "https://opensheet.elk.sh/$1" }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [{ "key": "Access-Control-Allow-Origin", "value": "*" }]
-    }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
 }
