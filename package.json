@@ -4,12 +4,22 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "railway run nodemon npm start",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "googleapis": "^88.2.0"
+    "cors": "^2.8.5",
+    "express": "^4.17.2",
+    "googleapis": "^88.2.0",
+    "markdown-it": "^12.3.0",
+    "morgan": "^1.10.0",
+    "node-fetch": "^2.6.6",
+    "redis": "^4.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
   }
 }
