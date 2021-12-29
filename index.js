@@ -54,7 +54,6 @@ app.get("/:id/:sheet", async (req, res) => {
 
   const cacheKey = `${id}--${sheet}`;
   if (await redis.exists(cacheKey)) {
-    console.log(`Cache hit for ${cacheKey}`);
     return res.json(JSON.parse(await redis.get(cacheKey)));
   }
 
@@ -102,9 +101,6 @@ app.get("/:id/:sheet", async (req, res) => {
       await redis.set(cacheKey, JSON.stringify(rows), {
         EX: 30, // Cache for 30 seconds
       });
-      console.log(
-        `Cache miss for ${cacheKey}, refetched and stored for 30 seconds`
-      );
 
       return res.json(rows);
     }
