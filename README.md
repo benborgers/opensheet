@@ -30,6 +30,10 @@ https://opensheet.elk.sh/1o5t26He2DzTweYeleXOGiDjlU4Jkx896f95VUHVgS8U/1
 
 _Take note that the first sheet in order is numbered `1`, not `0`._
 
+## Caching
+
+Responses are cached for 30 seconds in order to improve performance and to avoid hitting Google Sheets’ rate limits, so it might take up to 30 seconds for fresh edits to show up in the API response.
+
 ## Recent hosting changes
 
 I’ve moved the hosted instance from [Vercel](https://vercel.com) to [Railway](https://railway.app), and therefore the base URL has changed from `opensheet.vercel.app` to `opensheet.elk.sh`. `opensheet.vercel.app` will continue to redirect to the correct URL, but you should update your code to use `opensheet.elk.sh` to avoid the slight performance hit that comes from needing to redirect.
