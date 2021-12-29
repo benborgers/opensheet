@@ -12,7 +12,9 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.2",
-    "googleapis": "^88.2.0"
+    "googleapis": "^88.2.0",
+    "markdown-it": "^12.3.0",
+    "node-fetch": "^2.6.6"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"

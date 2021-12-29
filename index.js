@@ -1,13 +1,15 @@
 const express = require("express");
 const app = express();
+const fs = require("fs");
+const fetch = require("node-fetch");
+const MarkdownIt = require("markdown-it");
+const md = new MarkdownIt();
 
 const { google } = require("googleapis");
-
 const auth = new google.auth.GoogleAuth({
   credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT), // Added in Railway
   scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
 });
-
 const sheets = google.sheets({ version: "v4", auth });
 
 app.use("*", (req, res, next) => {
@@ -15,9 +17,18 @@ app.use("*", (req, res, next) => {
   next();
 });
 
-app.get("/", (req, res) => {
-  // TODO: docs microsite
-  res.send("todo");
+app.get("/", async (req, res) => {
+  let html = fs.readFileSync("./index.html", "utf-8");
+
+  const readme = await (
+    await fetch(
+      "https://raw.githubusercontent.com/benborgers/opensheet/main/README.md"
+    )
+  ).text();
+
+  html = html.replace("README_HTML", md.render(readme));
+
+  return res.send(html);
 });
 
 app.get("/:id/:sheet", async (req, res) => {
