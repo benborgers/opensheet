@@ -8,7 +8,12 @@ A free, super simple, hosted API for getting Google Sheets as JSON.
 
 ## Documentation
 
-This API returns a given Google Sheet’s rows as JSON data. In order to use it, the first column of your Google Sheet should be column headers. [Here’s an example](https://docs.google.com/spreadsheets/d/1o5t26He2DzTweYeleXOGiDjlU4Jkx896f95VUHVgS8U/edit).
+This API returns a given Google Sheet’s rows as JSON data.
+
+In order to use it:
+
+1. The first column of your Google Sheet should be column headers ([here’s an example](https://docs.google.com/spreadsheets/d/1o5t26He2DzTweYeleXOGiDjlU4Jkx896f95VUHVgS8U/edit)).
+1. Link sharing must be turned on so anyone with the link can _view_ the Google Sheet.
 
 The format for this API is:
 

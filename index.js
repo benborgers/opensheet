@@ -26,7 +26,9 @@ let redis = {
 })();
 
 app.use(
-  require("morgan")(":method :url :status - :response-time ms (via :referrer)")
+  require("morgan")(
+    ":method :url :status - :response-time ms (via :referrer :user-agent)"
+  )
 );
 app.use(require("cors")());
 
