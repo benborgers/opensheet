@@ -81,7 +81,7 @@ app.get("/:id/:sheet", async (req, res) => {
 
       const rows = [];
 
-      const rawRows = result.data.values;
+      const rawRows = result.data.values || [];
       const headers = rawRows.shift();
 
       rawRows.forEach((row) => {
@@ -102,3 +102,7 @@ app.get("/:id/:sheet", async (req, res) => {
 });
 
 app.listen(3000, () => console.log("http://localhost:3000"));
+
+// Avoid a single error from crashing the server in production.
+process.on("uncaughtException", (...args) => console.error(args));
+process.on("unhandledRejection", (...args) => console.error(args));
