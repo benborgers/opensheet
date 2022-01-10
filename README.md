@@ -47,9 +47,10 @@ I’ve moved the hosted instance from [Vercel](https://vercel.com) to [Railway](
 
 _This section is only necessary if you want to fork opensheet and host your own instance of it. If you don’t want to deal with that, you’re welcome to use my hosted instance at `opensheet.elk.sh`._
 
-opensheet is written as a Node.js [Express](https://expressjs.com) server, which can be hosted on any platform that enables deploying a Node.js server. It also uses a Redis server for caching, but will run fine without caching if Redis isn’t present.
+opensheet is written as a Node.js [Express](https://expressjs.com) server, which can be hosted on any platform that enables deploying a Node.js server. It also uses a 
+server for caching, but will run fine without caching if Redis isn’t present.
 
-You can spin up your own instance of opensheet on Railway by clicking the button below. It won’t include a Redis instance by default, but you can add one on Railway to enable caching. 
+You can spin up your own instance of opensheet on Railway by clicking the button below. It won’t include a Redis instance by default, but you can optionally add one on Railway to enable caching. 
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https%3A%2F%2Fgithub.com%2Fbenborgers%2Fopensheet&referralCode=ben)
 
