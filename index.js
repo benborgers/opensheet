@@ -1,108 +1,88 @@
-const express = require("express");
-const app = express();
-
-const { google } = require("googleapis");
-const auth = new google.auth.GoogleAuth({
-  credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT), // Added in Railway
-  scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
-});
-const sheets = google.sheets({ version: "v4", auth });
-
-const { createClient } = require("redis");
-let redis = {
-  exists: () => false,
-  set: () => null,
-};
-(async () => {
-  if (process.env.REDIS_URL) {
-    redis = createClient({ url: process.env.REDIS_URL });
-    await redis.connect();
-    console.log("Connected to Redis");
-  } else {
-    console.log(
-      "No Redis URL found (no process.env.REDIS_URL), so no caching will be done"
-    );
-  }
-})();
-
-app.use(
-  require("morgan")(":method :url :status - :response-time ms (via :referrer)")
-);
-app.use(require("cors")());
-
-app.get("/", async (req, res) => {
-  res.redirect("https://github.com/benborgers/opensheet#readme");
+addEventListener("fetch", (event) => {
+  event.respondWith(handleRequest(event.request));
 });
 
-app.get("/:id/:sheet", async (req, res) => {
-  let { id, sheet } = req.params;
-  // This is what Vercel does, and we want to keep this behavior
-  // even after migrating off of Vercel so there's no breaking change.
-  sheet = sheet.replace(/\+/g, " ");
+async function handleRequest(request) {
+  const url = new URL(request.url);
 
-  const cacheKey = `${id}--${sheet}`;
-  if (await redis.exists(cacheKey)) {
-    return res.json(JSON.parse(await redis.get(cacheKey)));
+  if (url.pathname === "/") {
+    return new Response("", {
+      status: 302,
+      headers: {
+        location: "https://github.com/benborgers/opensheet#readme",
+      },
+    });
   }
+
+  let [id, sheet, ...otherParams] = url.pathname
+    .slice(1)
+    .split("/")
+    .filter((x) => x);
+
+  if (!id || !sheet || otherParams.length > 0) {
+    return error("URL format is /spreadsheet_id/sheet_name");
+  }
+
+  sheet = decodeURIComponent(sheet.replace(/\+/g, " "));
+
+  const cacheKey = `${id}/${sheet}`;
 
   if (!isNaN(sheet)) {
-    let data;
-    try {
-      const response = await sheets.spreadsheets.get({
-        spreadsheetId: id,
-      });
-      data = response.data;
-    } catch (error) {
-      return res.json({ error: error.response.data.error.message });
+    if (parseInt(sheet) === 0) {
+      return error("For this API, sheet numbers start at 1");
     }
 
-    if (parseInt(sheet) === 0) {
-      return res.json({ error: "For this API, sheet numbers start at 1" });
+    const sheetData = await (
+      await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${id}?key=${GOOGLE_API_KEY}`
+      )
+    ).json();
+
+    if (sheetData.error) {
+      return error(sheetData.error.message);
     }
 
     const sheetIndex = parseInt(sheet) - 1;
+    const sheetWithThisIndex = sheetData.sheets[sheetIndex];
 
-    if (!data.sheets[sheetIndex]) {
-      return res.json({ error: `There is no sheet number ${sheet}` });
+    if (!sheetWithThisIndex) {
+      return error(`There is no sheet number ${sheet}`);
     }
 
-    sheet = data.sheets[sheetIndex].properties.title;
+    sheet = sheetWithThisIndex.properties.title;
   }
 
-  sheets.spreadsheets.values.get(
-    {
-      spreadsheetId: id,
-      range: sheet,
-    },
-    async (error, result) => {
-      if (error) {
-        return res.json({ error: error.response.data.error.message });
-      }
+  const result = await (
+    await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${sheet}?key=${GOOGLE_API_KEY}`
+    )
+  ).json();
 
-      const rows = [];
+  if (result.error) {
+    return error(result.error.message);
+  }
 
-      const rawRows = result.data.values || [];
-      const headers = rawRows.shift();
+  const rows = [];
 
-      rawRows.forEach((row) => {
-        const rowData = {};
-        row.forEach((item, index) => {
-          rowData[headers[index]] = item;
-        });
-        rows.push(rowData);
-      });
+  const rawRows = result.values || [];
+  const headers = rawRows.shift();
 
-      await redis.set(cacheKey, JSON.stringify(rows), {
-        EX: 30, // Cache for 30 seconds
-      });
+  rawRows.forEach((row) => {
+    const rowData = {};
+    row.forEach((item, index) => {
+      rowData[headers[index]] = item;
+    });
+    rows.push(rowData);
+  });
 
-      return res.json(rows);
-    }
-  );
-});
+  return new Response(JSON.stringify(rows), {
+    headers: { "content-type": "application/json" },
+  });
+}
 
-app.listen(3000, () => console.log("http://localhost:3000"));
-
-// Avoid a single error from crashing the server in production.
-process.on("uncaughtException", (...args) => console.error(args));
-process.on("unhandledRejection", (...args) => console.error(args));
+const error = (message) => {
+  return new Response(JSON.stringify({ error: message }), {
+    status: 400,
+    headers: { "content-type": "application/json" },
+  });
+};
