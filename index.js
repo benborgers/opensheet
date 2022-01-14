@@ -1,9 +1,9 @@
 addEventListener("fetch", (event) => {
-  event.respondWith(handleRequest(event.request));
+  event.respondWith(handleRequest(event));
 });
 
-async function handleRequest(request) {
-  const url = new URL(request.url);
+async function handleRequest(event) {
+  const url = new URL(event.request.url);
 
   if (url.pathname === "/") {
     return new Response("", {
@@ -90,8 +90,7 @@ async function handleRequest(request) {
     },
   });
 
-  await cache.put(cacheKey, apiResponse.clone());
-  console.log(`Cached: ${cacheKey}`);
+  event.waitUntil(cache.put(cacheKey, apiResponse.clone()));
 
   return apiResponse;
 }
