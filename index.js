@@ -20,12 +20,20 @@ async function handleRequest(request) {
     .filter((x) => x);
 
   if (!id || !sheet || otherParams.length > 0) {
-    return error("URL format is /spreadsheet_id/sheet_name");
+    return error("URL format is /spreadsheet_id/sheet_name", 404);
+  }
+
+  const cacheKey = `https://opensheet.elk.sh/${id}/${sheet}`;
+  const cache = caches.default;
+  const cachedResponse = await cache.match(cacheKey);
+  if (cachedResponse) {
+    console.log(`Serving from cache: ${cacheKey}`);
+    return cachedResponse;
+  } else {
+    console.log(`Cache miss: ${cacheKey}`);
   }
 
   sheet = decodeURIComponent(sheet.replace(/\+/g, " "));
-
-  const cacheKey = `${id}/${sheet}`;
 
   if (!isNaN(sheet)) {
     if (parseInt(sheet) === 0) {
@@ -75,14 +83,22 @@ async function handleRequest(request) {
     rows.push(rowData);
   });
 
-  return new Response(JSON.stringify(rows), {
-    headers: { "content-type": "application/json" },
+  const apiResponse = new Response(JSON.stringify(rows), {
+    headers: {
+      "content-type": "application/json",
+      "cache-control": "s-maxage=30",
+    },
   });
+
+  await cache.put(cacheKey, apiResponse.clone());
+  console.log(`Cached: ${cacheKey}`);
+
+  return apiResponse;
 }
 
-const error = (message) => {
+const error = (message, status = 400) => {
   return new Response(JSON.stringify({ error: message }), {
-    status: 400,
+    status: status,
     headers: { "content-type": "application/json" },
   });
 };
