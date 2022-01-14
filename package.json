@@ -4,8 +4,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler publish",
-    "add-env-variables": "wrangler secret put GOOGLE_API_KEY",
-    "logs": "wrangler tail --format pretty"
+    "add-env-variables": "wrangler secret put GOOGLE_API_KEY"
   },
   "author": "Ben Borgers <ben@elk.sh>",
   "license": "ISC",
