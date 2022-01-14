@@ -41,27 +41,26 @@ Responses are cached for 30 seconds in order to improve performance and to avoid
 
 ## Recent hosting changes
 
-I’ve moved the hosted instance from [Vercel](https://vercel.com) to [Railway](https://railway.app), and therefore the base URL has changed from `opensheet.vercel.app` to `opensheet.elk.sh`. `opensheet.vercel.app` will continue to redirect to the correct URL, but you should update your code to use `opensheet.elk.sh` to avoid the slight performance hit that comes from needing to redirect.
+I’ve moved the hosted instance of opensheet through a couple providers:
+
+- First Vercel, which ended up being too expensive.
+- Then Railway, which ended up being a bit unreliable.
+- Most recently, Cloudflare Workers!
+
+Note that the base URL is now `opensheet.elk.sh`, not `opensheet.vercel.app`. `opensheet.vercel.app` will continue to redirect to the correct URL, but you should update your code to use `opensheet.elk.sh` to avoid the slight performance degradation that comes from needing to redirect.
 
 ## Self-hosting
 
 _This section is only necessary if you want to fork opensheet and host your own instance of it. If you don’t want to deal with that, you’re welcome to use my hosted instance at `opensheet.elk.sh`._
 
-opensheet is written as a Node.js [Express](https://expressjs.com) server, which can be hosted on any platform that enables deploying a Node.js server. It also uses a 
-server for caching, but will run fine without caching if Redis isn’t present.
+opensheet is written as a [Cloudflare Worker](https://workers.cloudflare.com). It uses Cloudflare’s [Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache) for caching, however note that the Cache API only works on custom domains (not `*.workers.dev` domains).
 
-You can spin up your own instance of opensheet on Railway by clicking the button below. It won’t include a Redis instance by default, but you can optionally add one on Railway to enable caching. 
-
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https%3A%2F%2Fgithub.com%2Fbenborgers%2Fopensheet&referralCode=ben)
-
-If you host opensheet in your own Railway account or make a fork, you’ll need to get your own Google Sheets API credentials:
+If you host opensheet in your own Cloudflare account or make a fork, you’ll need to get your own Google Sheets API key:
 
 1. Go to the [Google Cloud Console](https://console.cloud.google.com) and create a new project from the top navigation bar.
 2. Search for “Google Sheets API” and enable it.
-3. On the left bar, go to Credentials and click “Create Credentials” → “Service account”. _Service accounts_ are Google’s concept for a Google account that you can control programmatically.
-4. Fill in any reasonable name, and skip the next two optional steps. Click “Done” to create the set of credentials, which will allow you to access Google Sheets using the API.
-5. Click on this newly created service account, and then go to the “Keys” tab. Create a key of type JSON.
-6. A JSON file containing the service account’s credentials will be downloaded. Open up that file, and copy its entire contents. **You should paste this whole thing into the `GOOGLE_SERVICE_ACCOUNT` environment variable.** Procedures for doing this vary based on deployment provider (Railway, Heroku, etc).
+3. Search for “Credentials” and create an API key. If you want, you can restrict it to only be able to access the Google Sheets API.
+4. Run `npm run add-env-variables` and paste in the API key.
 
 ## Local development
 
@@ -69,6 +68,8 @@ If you host opensheet in your own Railway account or make a fork, you’ll need 
 npm run dev
 ```
 
-This uses `railway run`, and therefore assumes that you have the [Railway CLI](https://docs.railway.app/develop/cli) installed and have [linked it to your project](https://docs.railway.app/develop/cli#link-to-a-project).
+## Deployment
 
-The benefit of using `railway run` in local development is that it injects environment variables (`GOOGLE_SERVICE_ACCOUNT` and `REDIS_URL`) without needing to have them locally.
+```sh
+npm run deploy
+```

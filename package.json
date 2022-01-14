@@ -1,23 +1,14 @@
 {
   "name": "opensheet",
-  "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "railway run nodemon npm start",
-    "start": "node index.js"
+    "dev": "wrangler dev",
+    "deploy": "wrangler publish",
+    "add-env-variables": "wrangler secret put GOOGLE_API_KEY"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Ben Borgers <ben@elk.sh>",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.17.2",
-    "googleapis": "^88.2.0",
-    "morgan": "^1.10.0",
-    "redis": "^4.0.1"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.15"
+    "@cloudflare/wrangler": "^1.19.7"
   }
 }
