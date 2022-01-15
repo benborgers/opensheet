@@ -85,8 +85,9 @@ async function handleRequest(event) {
 
   const apiResponse = new Response(JSON.stringify(rows), {
     headers: {
-      "content-type": "application/json",
-      "cache-control": "s-maxage=30",
+      "Content-Type": "application/json",
+      "Cache-Control": "s-maxage=30",
+      "Access-Control-Allow-Origin": "*",
     },
   });
 
@@ -98,6 +99,9 @@ async function handleRequest(event) {
 const error = (message, status = 400) => {
   return new Response(JSON.stringify({ error: message }), {
     status: status,
-    headers: { "content-type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
   });
 };

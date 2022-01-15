@@ -73,3 +73,7 @@ npm run dev
 ```sh
 npm run deploy
 ```
+
+## Troubleshooting
+
+For some reason, I was getting the error `Error: expected value at line 1 column 1` when running `npm run dev`. I fixed this by uncommenting the `workers_dev` line and commenting the `route` line in `wrangler.toml`.
