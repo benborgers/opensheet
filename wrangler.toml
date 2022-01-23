@@ -6,6 +6,6 @@ compatibility_date = "2022-01-14"
 # Uncomment if you don’t have a custom domain.
 # workers_dev = true
 
-# For custom domain — comment out if you don’t have a custom domain.
+# For custom domain — comment out if you don’t have a custom domain.
 zone_id = "bb3900bc46e7f1f8ff6820941737ff05"
 route = "opensheet.elk.sh/*"
