@@ -6,8 +6,7 @@
     "deploy": "wrangler publish",
     "add-env-variables": "wrangler secret put GOOGLE_API_KEY"
   },
-  "author": "Ben Borgers <ben@elk.sh>",
-  "license": "ISC",
+  "author": "Ben Borgers <benborgers@hey.com>",
   "dependencies": {
     "@cloudflare/wrangler": "^1.19.7"
   }
