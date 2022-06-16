@@ -18,7 +18,7 @@ In order to use it:
 The format for this API is:
 
 ```
-https://opensheet.elk.sh/spreadsheet_id/sheet_name
+https://opensheet.elk.sh/spreadsheet_id/tab_name
 ```
 
 For example:
@@ -27,7 +27,7 @@ For example:
 https://opensheet.elk.sh/1o5t26He2DzTweYeleXOGiDjlU4Jkx896f95VUHVgS8U/Test+Sheet
 ```
 
-You can also replace `sheet_name` with the sheet number (in the order that the tabs are arranged), if you don’t know the name. For example, to get the first sheet:
+You can also replace `tab_name` with the tab number (in the order that the tabs are arranged), if you don’t know the name. For example, to get the first sheet:
 
 ```
 https://opensheet.elk.sh/1o5t26He2DzTweYeleXOGiDjlU4Jkx896f95VUHVgS8U/1
