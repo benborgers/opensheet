@@ -1,5 +1,7 @@
 # opensheet
 
+A very awesome open source project! 🇮🇳🇮🇳🇮🇳
+
 A free, super simple, hosted API for getting Google Sheets as JSON.
 
 **Tutorial blog post:** [benborgers.com/posts/google-sheets-json](https://benborgers.com/posts/google-sheets-json)
