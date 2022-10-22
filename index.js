@@ -83,8 +83,8 @@ async function handleRequest(event) {
     rows.push(rowData);
   });
 
-  const { searchParams } = new URL(request.url);
-  const ttlSeconds = parseInt(searchParams.get('ttl')) || 30;
+  const { searchParams } = new URL(event.request.url);
+  let ttlSeconds = parseInt(searchParams.get('ttl')) || 30;
   if (ttlSeconds < 30) ttlSeconds = 30;
 
   const apiResponse = new Response(JSON.stringify(rows), {
