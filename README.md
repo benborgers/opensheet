@@ -1,7 +1,5 @@
 # opensheet
 
-A very awesome open source project! 🇮🇳🇮🇳🇮🇳
-
 A free, super simple, hosted API for getting Google Sheets as JSON.
 
 **Tutorial blog post:** [benborgers.com/posts/google-sheets-json](https://benborgers.com/posts/google-sheets-json)
@@ -20,16 +18,14 @@ In order to use it:
 The format for this API is:
 
 ```
-https://opensheet.elk.sh/spreadsheet_id/tab_name?ttl=seconds
+https://opensheet.elk.sh/spreadsheet_id/tab_name
 ```
 
 For example:
 
 ```
-https://opensheet.elk.sh/1o5t26He2DzTweYeleXOGiDjlU4Jkx896f95VUHVgS8U/Test+Sheet?ttl=60
+https://opensheet.elk.sh/1o5t26He2DzTweYeleXOGiDjlU4Jkx896f95VUHVgS8U/Test+Sheet
 ```
-
-The `ttl` URL parameter is the number of seconds the response should be [cached](https://developers.cloudflare.com/workers/runtime-apis/cache/) for. Values shorter than 30 seconds will be ignored.
 
 You can also replace `tab_name` with the tab number (in the order that the tabs are arranged), if you don’t know the name. For example, to get the first sheet:
 
