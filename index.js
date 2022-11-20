@@ -83,14 +83,10 @@ async function handleRequest(event) {
     rows.push(rowData);
   });
 
-  const { searchParams } = new URL(event.request.url);
-  let ttlSeconds = parseInt(searchParams.get('ttl')) || 30;
-  if (ttlSeconds < 30) ttlSeconds = 30;
-
   const apiResponse = new Response(JSON.stringify(rows), {
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": `s-maxage=${ttlSeconds}`,
+      "Cache-Control": `s-maxage=30`,
       "Access-Control-Allow-Origin": "*",
     },
   });
