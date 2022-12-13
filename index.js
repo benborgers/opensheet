@@ -88,6 +88,8 @@ async function handleRequest(event) {
       "Content-Type": "application/json",
       "Cache-Control": `s-maxage=30`,
       "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers":
+        "Origin, X-Requested-With, Content-Type, Accept",
     },
   });
 
@@ -102,6 +104,8 @@ const error = (message, status = 400) => {
     headers: {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers":
+        "Origin, X-Requested-With, Content-Type, Accept",
     },
   });
 };
