@@ -1,3 +1,14 @@
+const CACHE: Record<string, { expiry: Date; value: any }> = {};
+
+// Every 10 seconds, evict expired items from the cache.
+setTimeout(() => {
+  for (const key in CACHE) {
+    if (CACHE[key].expiry <= new Date()) {
+      delete CACHE[key];
+    }
+  }
+}, 10_000);
+
 const DEFAULT_HEADERS = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
@@ -36,6 +47,14 @@ Bun.serve({
 
     sheet = decodeURIComponent(sheet.replace(/\+/g, " "));
 
+    const cacheKey = `${id}/${sheet}`;
+
+    if (CACHE[cacheKey] && CACHE[cacheKey].expiry > new Date()) {
+      return new Response(JSON.stringify(CACHE[cacheKey].value), {
+        headers: DEFAULT_HEADERS,
+      });
+    }
+
     // TODO: handle number sheets
 
     const result: {
@@ -66,6 +85,11 @@ Bun.serve({
       });
       rows.push(rowData);
     });
+
+    CACHE[cacheKey] = {
+      expiry: new Date(new Date().getTime() + 1_000 * 30), // Cache for 30 seconds
+      value: rows,
+    };
 
     return new Response(JSON.stringify(rows), {
       headers: DEFAULT_HEADERS,
