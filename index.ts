@@ -23,6 +23,14 @@ const error = (message: string, status: number = 400) => {
   });
 };
 
+type ApiErrorResponse = {
+  error: {
+    code: number;
+    message: string;
+    status: string;
+  };
+};
+
 Bun.serve({
   async fetch(req) {
     const url = new URL(req.url);
@@ -55,7 +63,37 @@ Bun.serve({
       });
     }
 
-    // TODO: handle number sheets
+    // If the sheet is a number, assume it's a sheet index.
+    if (!isNaN(parseInt(sheet))) {
+      if (parseInt(sheet) === 0) {
+        return error("For this API, sheet numbers start at 1");
+      }
+
+      const sheetData:
+        | {
+            sheets: {
+              properties: { title: string };
+            }[];
+          }
+        | ApiErrorResponse = await (
+        await fetch(
+          `https://sheets.googleapis.com/v4/spreadsheets/${id}?key=${process.env.GOOGLE_API_KEY}`
+        )
+      ).json();
+
+      if ("error" in sheetData) {
+        return error(sheetData.error.message);
+      }
+
+      const sheetIndex = parseInt(sheet) - 1;
+      const sheetWithThisIndex = sheetData.sheets[sheetIndex];
+
+      if (!sheetWithThisIndex) {
+        return error(`There is no sheet number ${sheet}`);
+      }
+
+      sheet = sheetWithThisIndex.properties.title;
+    }
 
     const result:
       | {
@@ -63,7 +101,7 @@ Bun.serve({
           majorDimension: string;
           values: string[][];
         }
-      | { error: { code: number; message: string; status: string } } = await (
+      | ApiErrorResponse = await (
       await fetch(
         `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
           sheet
