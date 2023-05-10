@@ -57,17 +57,23 @@ Bun.serve({
 
     // TODO: handle number sheets
 
-    const result: {
-      range: string;
-      majorDimension: string;
-      values: string[][];
-    } = await (
+    const result:
+      | {
+          range: string;
+          majorDimension: string;
+          values: string[][];
+        }
+      | { error: { code: number; message: string; status: string } } = await (
       await fetch(
         `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
           sheet
         )}?key=${process.env.GOOGLE_API_KEY}`
       )
     ).json();
+
+    if ("error" in result) {
+      return error(result.error.message);
+    }
 
     const rows: Record<string, string>[] = [];
 
