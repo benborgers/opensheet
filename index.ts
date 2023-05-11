@@ -35,6 +35,14 @@ Bun.serve({
   async fetch(req) {
     const url = new URL(req.url);
 
+    console.log(
+      `${new Date().toLocaleString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        second: "numeric",
+      })} ${url.pathname}`
+    );
+
     if (url.pathname === "/") {
       return new Response("", {
         status: 302,
