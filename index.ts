@@ -131,7 +131,7 @@ Bun.serve({
     });
 
     CACHE.set(cacheKey, {
-      expiry: new Date(new Date().getTime() + 1_000 * 30), // Cache for 30 seconds
+      expiry: new Date(new Date().getTime() + 1_000 * 60), // Cache for 60 seconds
       value: rows,
     });
 
