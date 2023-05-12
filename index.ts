@@ -3,7 +3,7 @@ const CACHE = new Map();
 // Every 10 seconds, evict expired items from the cache.
 setTimeout(() => {
   for (const key in CACHE) {
-    if (CACHE.get(key).expiry <= new Date()) {
+    if (CACHE.get(key).expiry < new Date()) {
       CACHE.delete(key);
     }
   }
@@ -16,9 +16,19 @@ const DEFAULT_HEADERS = {
     "Origin, X-Requested-With, Content-Type, Accept",
 };
 
-const error = (message: string, status: number = 400) => {
-  return new Response(JSON.stringify({ error: message }), {
-    status: status,
+const error = (message: string, cacheKey?: string) => {
+  const value = JSON.stringify({ error: message });
+
+  if (cacheKey) {
+    CACHE.set(cacheKey, {
+      expiry: new Date(new Date().getTime() + 1_000 * 30), // Cache for 30 seconds
+      value,
+      error: true,
+    });
+  }
+
+  return new Response(value, {
+    status: 400,
     headers: DEFAULT_HEADERS,
   });
 };
@@ -50,15 +60,17 @@ Bun.serve({
       .filter((x) => x);
 
     if (!id || !sheet || otherParams.length > 0) {
-      return error("URL format is /spreadsheet_id/sheet_name", 404);
+      return error("URL format is /spreadsheet_id/sheet_name", undefined);
     }
 
     sheet = decodeURIComponent(sheet.replace(/\+/g, " "));
 
     const cacheKey = `${id}/${sheet}`;
 
-    if (CACHE.get(cacheKey)?.expiry > new Date()) {
-      return new Response(JSON.stringify(CACHE.get(cacheKey).value), {
+    const cacheRecord = CACHE.get(cacheKey);
+    if (cacheRecord?.expiry >= new Date()) {
+      return new Response(cacheRecord.value, {
+        status: cacheRecord.error ? 400 : 200,
         headers: DEFAULT_HEADERS,
       });
     }
@@ -66,7 +78,7 @@ Bun.serve({
     // If the sheet is a number, assume it's a sheet index.
     if (!isNaN(parseInt(sheet))) {
       if (parseInt(sheet) === 0) {
-        return error("For this API, sheet numbers start at 1");
+        return error("For this API, sheet numbers start at 1", cacheKey);
       }
 
       const sheetData:
@@ -82,14 +94,14 @@ Bun.serve({
       ).json();
 
       if ("error" in sheetData) {
-        return error(sheetData.error.message);
+        return error(sheetData.error.message, cacheKey);
       }
 
       const sheetIndex = parseInt(sheet) - 1;
       const sheetWithThisIndex = sheetData.sheets[sheetIndex];
 
       if (!sheetWithThisIndex) {
-        return error(`There is no sheet number ${sheet}`);
+        return error(`There is no sheet number ${sheet}`, cacheKey);
       }
 
       sheet = sheetWithThisIndex.properties.title;
@@ -110,7 +122,7 @@ Bun.serve({
     ).json();
 
     if ("error" in result) {
-      return error(result.error.message);
+      return error(result.error.message, cacheKey);
     }
 
     const rows: Record<string, string>[] = [];
@@ -119,7 +131,7 @@ Bun.serve({
     const headers = rawRows.shift();
 
     if (!headers) {
-      return error("Sheet is empty");
+      return error("Sheet is empty", cacheKey);
     }
 
     rawRows.forEach((row) => {
@@ -130,12 +142,14 @@ Bun.serve({
       rows.push(rowData);
     });
 
+    const value = JSON.stringify(rows);
+
     CACHE.set(cacheKey, {
-      expiry: new Date(new Date().getTime() + 1_000 * 60), // Cache for 60 seconds
-      value: rows,
+      expiry: new Date(new Date().getTime() + 1_000 * 30), // Cache for 30 seconds
+      value,
     });
 
-    return new Response(JSON.stringify(rows), {
+    return new Response(value, {
       headers: DEFAULT_HEADERS,
     });
   },
