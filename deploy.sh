@@ -4,7 +4,7 @@
 git pull
 
 # Find the process ID (PID) using lsof
-pid=$(lsof -t -i :3000)
+pid=$(lsof -ti :3000 -sTCP:LISTEN -c bun)
 
 if [[ -n $pid ]]; then
     # Process found, kill it using kill -9
