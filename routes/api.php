@@ -52,7 +52,8 @@ Route::get('{id}/{sheet}', function ($id, $sheet) {
         $headers = array_shift($rows);
 
         foreach ($rows as $row) {
-            $output[] = array_combine($headers, $row);
+            $min = min(count($headers), count($row));
+            $output[] = array_combine(array_slice($headers, 0, $min), array_slice($row, 0, $min));
         }
 
         return $output;
