@@ -76,7 +76,7 @@ Bun.serve({
     }
 
     // If the sheet is a number, assume it's a sheet index.
-    if (!isNaN(parseInt(sheet))) {
+    if (!isNaN(sheet)) {
       if (parseInt(sheet) === 0) {
         return error("For this API, sheet numbers start at 1", cacheKey);
       }
