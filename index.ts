@@ -94,6 +94,11 @@ Bun.serve({
       ).json();
 
       if ("error" in sheetData) {
+        console.log(
+          "Error",
+          sheetData.error.message,
+          `https://sheets.googleapis.com/v4/spreadsheets/${id}`
+        );
         return error(sheetData.error.message, cacheKey);
       }
 
