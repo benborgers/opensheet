@@ -17,6 +17,7 @@ class AddHeaders
     {
         $response = $next($request);
         $response->header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+        $response->header('X-Beta', '1');
 
         return $response;
     }
