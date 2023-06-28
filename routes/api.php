@@ -1,22 +1,23 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', 'https://github.com/benborgers/opensheet#readme');
 
-function error($message)
-{
-    abort(response()->json([
-        'error' => $message
-    ], 400));
+if (! function_exists('error')) {
+    function error($message)
+    {
+        abort(response()->json([
+            'error' => $message,
+        ], 400));
+    }
 }
 
 function look_up_numeric_sheet($sheet, $id)
 {
-    if (!is_numeric($sheet)) {
+    if (! is_numeric($sheet)) {
         return $sheet;
     }
 
@@ -64,6 +65,6 @@ Route::get('{id}/{sheet}', function ($id, $sheet) {
 
 Route::get('{any}', function () {
     return response()->json([
-        'error' => 'URL format is /spreadsheet_id/sheet_name'
+        'error' => 'URL format is /spreadsheet_id/sheet_name',
     ], 404);
 })->where('any', '.*');
