@@ -81,6 +81,7 @@ Bun.serve({
         return error("For this API, sheet numbers start at 1", cacheKey);
       }
 
+      console.log(`https://sheets.googleapis.com/v4/spreadsheets/${id}`);
       const sheetData:
         | {
             sheets: {
@@ -94,11 +95,6 @@ Bun.serve({
       ).json();
 
       if ("error" in sheetData) {
-        console.log(
-          "Error",
-          sheetData.error.message,
-          `https://sheets.googleapis.com/v4/spreadsheets/${id}`
-        );
         return error(sheetData.error.message, cacheKey);
       }
 
@@ -112,6 +108,9 @@ Bun.serve({
       sheet = sheetWithThisIndex.properties.title;
     }
 
+    console.log(
+      `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${sheet}`
+    );
     const result:
       | {
           range: string;
@@ -120,9 +119,7 @@ Bun.serve({
         }
       | ApiErrorResponse = await (
       await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
-          sheet
-        )}?key=${process.env.GOOGLE_API_KEY}`
+        `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${sheet}?key=${process.env.GOOGLE_API_KEY}`
       )
     ).json();
 
