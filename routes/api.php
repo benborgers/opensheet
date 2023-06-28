@@ -6,16 +6,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', 'https://github.com/benborgers/opensheet#readme');
 
-if (! function_exists('error')) {
+Route::get('{id}/{sheet}', function ($id, $sheet) {
     function error($message)
     {
         abort(response()->json([
             'error' => $message,
         ], 400));
     }
-}
 
-if (! function_exists('look_up_numeric_sheet')) {
     function look_up_numeric_sheet($sheet, $id)
     {
         if (! is_numeric($sheet)) {
@@ -38,9 +36,7 @@ if (! function_exists('look_up_numeric_sheet')) {
 
         return $sheetWithIndex['properties']['title'];
     }
-}
 
-Route::get('{id}/{sheet}', function ($id, $sheet) {
     $data = Cache::remember("{$id}/{$sheet}", app()->isLocal() ? 0 : 30, function () use ($id, $sheet) {
         $sheet = preg_replace('/\+/', ' ', $sheet);
         $sheet = look_up_numeric_sheet($sheet, $id);
