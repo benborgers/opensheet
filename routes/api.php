@@ -38,10 +38,25 @@ function look_up_numeric_sheet($sheet, $id)
 }
 
 Route::get('{id}/{sheet}', function ($id, $sheet) {
-    $data = Cache::remember("{$id}/{$sheet}", 30, function () use ($id, $sheet) {
+    $data = Cache::remember("{$id}/{$sheet}", app()->isLocal() ? 0 : 30, function () use ($id, $sheet) {
         $sheet = preg_replace('/\+/', ' ', $sheet);
         $sheet = look_up_numeric_sheet($sheet, $id);
-        return ['sheet' => $sheet];
+
+        $json = Http::get("https://sheets.googleapis.com/v4/spreadsheets/{$id}/values/{$sheet}?key=".config('services.google.key'))->json();
+        if (array_key_exists('error', $json)) {
+            error($json['error']['message']);
+        }
+
+        $output = [];
+
+        $rows = $json['values'] ?? [];
+        $headers = array_shift($rows);
+
+        foreach ($rows as $row) {
+            $output[] = array_combine($headers, $row);
+        }
+
+        return $output;
     });
 
     return response()->json($data);
