@@ -19,13 +19,13 @@ const DEFAULT_HEADERS = {
 const error = (message: string, cacheKey?: string) => {
   const value = JSON.stringify({ error: message });
 
-  if (cacheKey) {
-    CACHE.set(cacheKey, {
-      expiry: new Date(new Date().getTime() + 1_000 * 30), // Cache for 30 seconds
-      value,
-      error: true,
-    });
-  }
+  // if (cacheKey) {
+  //   CACHE.set(cacheKey, {
+  //     expiry: new Date(new Date().getTime() + 1_000 * 30), // Cache for 30 seconds
+  //     value,
+  //     error: true,
+  //   });
+  // }
 
   return new Response(value, {
     status: 400,
