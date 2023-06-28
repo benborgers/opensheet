@@ -109,7 +109,9 @@ Bun.serve({
     }
 
     console.log(
-      `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${sheet}`
+      `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
+        sheet
+      )}`
     );
     const result:
       | {
@@ -119,7 +121,9 @@ Bun.serve({
         }
       | ApiErrorResponse = await (
       await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${sheet}?key=${process.env.GOOGLE_API_KEY}`
+        `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
+          sheet
+        )}?key=${process.env.GOOGLE_API_KEY}`
       )
     ).json();
 
