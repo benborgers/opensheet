@@ -81,7 +81,7 @@ Bun.serve({
         return error("For this API, sheet numbers start at 1", cacheKey);
       }
 
-      console.log(`https://sheets.googleapis.com/v4/spreadsheets/${id}`);
+      // console.log(`https://sheets.googleapis.com/v4/spreadsheets/${id}`);
       const sheetData:
         | {
             sheets: {
@@ -108,11 +108,11 @@ Bun.serve({
       sheet = sheetWithThisIndex.properties.title;
     }
 
-    console.log(
-      `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
-        sheet
-      )}`
-    );
+    // console.log(
+    //   `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
+    //     sheet
+    //   )}`
+    // );
     const result:
       | {
           range: string;
