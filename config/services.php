@@ -32,7 +32,7 @@ return [
     ],
 
     'google' => [
-        'key' => env('GOOGLE_API_KEY')
+        'key' => env('GOOGLE_API_KEY'),
     ],
 
 ];
