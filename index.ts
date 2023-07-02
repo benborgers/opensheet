@@ -1,4 +1,4 @@
-import fs from "fs";
+// import fs from "fs";
 
 const CACHE = new Map();
 
@@ -83,13 +83,13 @@ Bun.serve({
         return error("For this API, sheet numbers start at 1", cacheKey);
       }
 
-      fs.appendFileSync(
-        "log.txt",
-        new Date().toISOString() +
-          " " +
-          `https://sheets.googleapis.com/v4/spreadsheets/${id}` +
-          "\n"
-      );
+      // fs.appendFileSync(
+      //   "log.txt",
+      //   new Date().toISOString() +
+      //     " " +
+      //     `https://sheets.googleapis.com/v4/spreadsheets/${id}` +
+      //     "\n"
+      // );
       const sheetData:
         | {
             sheets: {
@@ -116,15 +116,15 @@ Bun.serve({
       sheet = sheetWithThisIndex.properties.title;
     }
 
-    fs.appendFileSync(
-      "log.txt",
-      new Date().toISOString() +
-        " " +
-        `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
-          sheet
-        )}` +
-        "\n"
-    );
+    // fs.appendFileSync(
+    //   "log.txt",
+    //   new Date().toISOString() +
+    //     " " +
+    //     `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
+    //       sheet
+    //     )}` +
+    //     "\n"
+    // );
     const result:
       | {
           range: string;
