@@ -1,3 +1,5 @@
+import fs from "fs";
+
 const CACHE = new Map();
 
 // Every 10 seconds, evict expired items from the cache.
@@ -81,7 +83,13 @@ Bun.serve({
         return error("For this API, sheet numbers start at 1", cacheKey);
       }
 
-      // console.log(`https://sheets.googleapis.com/v4/spreadsheets/${id}`);
+      fs.appendFileSync(
+        "log.txt",
+        new Date().toISOString() +
+          " " +
+          `https://sheets.googleapis.com/v4/spreadsheets/${id}` +
+          "\n"
+      );
       const sheetData:
         | {
             sheets: {
@@ -108,11 +116,15 @@ Bun.serve({
       sheet = sheetWithThisIndex.properties.title;
     }
 
-    // console.log(
-    //   `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
-    //     sheet
-    //   )}`
-    // );
+    fs.appendFileSync(
+      "log.txt",
+      new Date().toISOString() +
+        " " +
+        `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
+          sheet
+        )}` +
+        "\n"
+    );
     const result:
       | {
           range: string;
