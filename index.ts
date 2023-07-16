@@ -43,9 +43,14 @@ type ApiErrorResponse = {
   };
 };
 
-Bun.serve({
-  async fetch(req) {
+export default {
+  port: 3000,
+  async fetch(req: Request) {
     const url = new URL(req.url);
+
+    const requestId = url.searchParams.get("request_id");
+
+    fs.appendFileSync("log.txt", `${requestId} [request] ${url.pathname}\n`);
 
     if (url.pathname === "/") {
       return new Response("", {
@@ -64,11 +69,6 @@ Bun.serve({
     if (!id || !sheet || otherParams.length > 0) {
       return error("URL format is /spreadsheet_id/sheet_name", undefined);
     }
-
-    fs.appendFileSync(
-      "log.txt",
-      new Date().toISOString() + " " + url.pathname + "\n"
-    );
 
     sheet = decodeURIComponent(sheet.replace(/\+/g, " "));
 
@@ -90,10 +90,7 @@ Bun.serve({
 
       fs.appendFileSync(
         "log.txt",
-        new Date().toISOString() +
-          " " +
-          `https://sheets.googleapis.com/v4/spreadsheets/${id}` +
-          "\n"
+        `${requestId} https://sheets.googleapis.com/v4/spreadsheets/${id}\n`
       );
       const sheetData:
         | {
@@ -123,12 +120,9 @@ Bun.serve({
 
     fs.appendFileSync(
       "log.txt",
-      new Date().toISOString() +
-        " " +
-        `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
-          sheet
-        )}` +
-        "\n"
+      `${requestId} https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
+        sheet
+      )}\n`
     );
     const result:
       | {
@@ -176,4 +170,4 @@ Bun.serve({
       headers: DEFAULT_HEADERS,
     });
   },
-});
+};
