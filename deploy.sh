@@ -4,7 +4,7 @@
 git pull
 
 # Find the process ID (PID) using lsof
-pid=$(lsof -ti :3000 -sTCP:LISTEN -c bun)
+pid=$(lsof -ti :3000 -sTCP:LISTEN -c node)
 
 if [[ -n $pid ]]; then
     # Process found, kill it using kill -9
@@ -16,4 +16,4 @@ else
 fi
 
 # Start server
-bun run index.ts &
+node index.js &
