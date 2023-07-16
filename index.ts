@@ -47,7 +47,10 @@ Bun.serve({
   async fetch(req) {
     const url = new URL(req.url);
 
-    fs.appendFileSync("log.txt", new Date().toISOString() + " " + url.pathname);
+    fs.appendFileSync(
+      "log.txt",
+      new Date().toISOString() + " " + url.pathname + "\n"
+    );
 
     if (url.pathname === "/") {
       return new Response("", {
