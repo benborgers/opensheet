@@ -50,7 +50,7 @@ export default {
 
     const requestId = url.searchParams.get("request_id");
 
-    fs.appendFileSync("log.txt", `${requestId} [request] ${url.pathname}\n`);
+    fs.appendFileSync("logs.txt", `${requestId} [request] ${url.pathname}\n`);
 
     if (url.pathname === "/") {
       return new Response("", {
@@ -89,7 +89,7 @@ export default {
       }
 
       fs.appendFileSync(
-        "log.txt",
+        "logs.txt",
         `${requestId} https://sheets.googleapis.com/v4/spreadsheets/${id}\n`
       );
       const sheetData:
@@ -119,7 +119,7 @@ export default {
     }
 
     fs.appendFileSync(
-      "log.txt",
+      "logs.txt",
       `${requestId} https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
         sheet
       )}\n`
