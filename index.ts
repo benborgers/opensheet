@@ -47,11 +47,6 @@ Bun.serve({
   async fetch(req) {
     const url = new URL(req.url);
 
-    fs.appendFileSync(
-      "log.txt",
-      new Date().toISOString() + " " + url.pathname + "\n"
-    );
-
     if (url.pathname === "/") {
       return new Response("", {
         status: 302,
@@ -69,6 +64,11 @@ Bun.serve({
     if (!id || !sheet || otherParams.length > 0) {
       return error("URL format is /spreadsheet_id/sheet_name", undefined);
     }
+
+    fs.appendFileSync(
+      "log.txt",
+      new Date().toISOString() + " " + url.pathname + "\n"
+    );
 
     sheet = decodeURIComponent(sheet.replace(/\+/g, " "));
 
