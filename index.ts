@@ -1,4 +1,4 @@
-// import fs from "fs";
+import fs from "fs";
 
 const CACHE = new Map();
 
@@ -23,7 +23,7 @@ const error = (message: string, cacheKey?: string) => {
 
   // if (cacheKey) {
   //   CACHE.set(cacheKey, {
-  //     expiry: new Date(new Date().getTime() + 1_000 * 60), // Cache for 60 seconds
+  //     expiry: new Date(new Date().getTime() + 1_000 * 30), // Cache for 30 seconds
   //     value,
   //     error: true,
   //   });
@@ -46,6 +46,8 @@ type ApiErrorResponse = {
 Bun.serve({
   async fetch(req) {
     const url = new URL(req.url);
+
+    fs.appendFileSync("log.txt", new Date().toISOString() + " " + url.pathname);
 
     if (url.pathname === "/") {
       return new Response("", {
@@ -83,13 +85,13 @@ Bun.serve({
         return error("For this API, sheet numbers start at 1", cacheKey);
       }
 
-      // fs.appendFileSync(
-      //   "log.txt",
-      //   new Date().toISOString() +
-      //     " " +
-      //     `https://sheets.googleapis.com/v4/spreadsheets/${id}` +
-      //     "\n"
-      // );
+      fs.appendFileSync(
+        "log.txt",
+        new Date().toISOString() +
+          " " +
+          `https://sheets.googleapis.com/v4/spreadsheets/${id}` +
+          "\n"
+      );
       const sheetData:
         | {
             sheets: {
@@ -116,15 +118,15 @@ Bun.serve({
       sheet = sheetWithThisIndex.properties.title;
     }
 
-    // fs.appendFileSync(
-    //   "log.txt",
-    //   new Date().toISOString() +
-    //     " " +
-    //     `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
-    //       sheet
-    //     )}` +
-    //     "\n"
-    // );
+    fs.appendFileSync(
+      "log.txt",
+      new Date().toISOString() +
+        " " +
+        `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
+          sheet
+        )}` +
+        "\n"
+    );
     const result:
       | {
           range: string;
@@ -163,7 +165,7 @@ Bun.serve({
     const value = JSON.stringify(rows);
 
     CACHE.set(cacheKey, {
-      expiry: new Date(new Date().getTime() + 1_000 * 60), // Cache for 60 seconds
+      expiry: new Date(new Date().getTime() + 1_000 * 30), // Cache for 30 seconds
       value,
     });
 
