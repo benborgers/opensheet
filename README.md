@@ -6,6 +6,8 @@ A free, super simple, hosted API for getting Google Sheets as JSON.
 
 **If you have questions:** benborgers@hey.com
 
+> ⭐️ opensheet's servers get 150,000,000 hits each month! If the project is is useful to you, I'd love your help in covering hosting costs. You can [sponsor me for $3/month on GitHub Sponsors](https://github.com/sponsors/benborgers). Thank you!
+
 ## Documentation
 
 This API returns a given Google Sheet’s rows as JSON data.
