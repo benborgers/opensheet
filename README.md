@@ -1,12 +1,14 @@
 # opensheet
 
+#### opensheet’s servers get 150,000,000 hits each month! <br /> If the project is is useful to you, I’d love your help in covering hosting costs. <br /> You can [sponsor me for $3/month on GitHub Sponsors](https://github.com/sponsors/benborgers). Thank you!
+
+---
+
 A free, super simple, hosted API for getting Google Sheets as JSON.
 
 **Tutorial blog post:** [benborgers.com/posts/google-sheets-json](https://benborgers.com/posts/google-sheets-json)
 
 **If you have questions:** benborgers@hey.com
-
-> ⭐️ opensheet's servers get 150,000,000 hits each month! If the project is is useful to you, I'd love your help in covering hosting costs. You can [sponsor me for $3/month on GitHub Sponsors](https://github.com/sponsors/benborgers). Thank you!
 
 ## Documentation
 
