@@ -23,7 +23,9 @@ async function handleRequest(event) {
     return error("URL format is /spreadsheet_id/sheet_name", 404);
   }
 
-  const cacheKey = `https://opensheet.elk.sh/${id}/${sheet}`;
+  const cacheKey = `https://opensheet.elk.sh/${id}/${encodeURIComponent(
+    sheet
+  )}`;
   const cache = caches.default;
   const cachedResponse = await cache.match(cacheKey);
   if (cachedResponse) {
@@ -42,7 +44,7 @@ async function handleRequest(event) {
 
     const sheetData = await (
       await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}?key=${GOOGLE_API_KEY}`
+        `https://sheets.googleapis.com/v4/spreadsheets/${id}?key=${GOOGLE_API_KEY}`
       )
     ).json();
 
@@ -62,7 +64,9 @@ async function handleRequest(event) {
 
   const result = await (
     await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${sheet}?key=${GOOGLE_API_KEY}`
+      `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
+        sheet
+      )}?key=${GOOGLE_API_KEY}`
     )
   ).json();
 
