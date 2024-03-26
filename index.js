@@ -42,7 +42,7 @@ async function handleRequest(event) {
 
     const sheetData = await (
       await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${id}?key=${GOOGLE_API_KEY}`
+        `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}?key=${GOOGLE_API_KEY}`
       )
     ).json();
 
