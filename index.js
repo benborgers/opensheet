@@ -75,7 +75,7 @@ async function handleRequest(event) {
 
   const rows = [];
 
-  const rawRows = (result.values || []);
+  const rawRows = result.values || [];
   const headers = rawRows.shift();
 
   rawRows.forEach((row) => {
