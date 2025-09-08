@@ -23,9 +23,9 @@ async function handleRequest(event) {
     return error("URL format is /spreadsheet_id/sheet_name", 404);
   }
 
-  const useIsoDates = url.searchParams.get("isoDates") === "true";
+  const useUnformattedValues = url.searchParams.get("raw") === "true";
 
-  const cacheKey = `https://opensheet.elk.sh/${id}/${encodeURIComponent(sheet)}?isoDates=${useIsoDates}`;
+  const cacheKey = `https://opensheet.elk.sh/${id}/${encodeURIComponent(sheet)}?raw=${useUnformattedValues}`;
 
   const cache = caches.default;
   const cachedResponse = await cache.match(cacheKey);
@@ -65,7 +65,7 @@ async function handleRequest(event) {
 
   const apiUrl = new URL(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(sheet)}`);
   apiUrl.searchParams.set("key", GOOGLE_API_KEY);
-  if (useIsoDates) apiUrl.searchParams.set("valueRenderOption", "UNFORMATTED_VALUE");
+  if (useUnformattedValues) apiUrl.searchParams.set("valueRenderOption", "UNFORMATTED_VALUE");
 
   const result = await (await fetch(apiUrl)).json();
 
@@ -75,19 +75,7 @@ async function handleRequest(event) {
 
   const rows = [];
 
-  // Convert serial dates to ISO timestamps
-  const rawRows = (result.values || []).map((row) => {
-    return row.map((cell) => {
-      if (useIsoDates && typeof cell === "number") {
-        const epoch = new Date(1899, 11, 30);
-        const date = new Date(epoch.getTime() + (cell * 24 * 60 * 60 * 1000));
-        return date.toISOString();
-      }
-
-      return cell;
-    });
-  });
-
+  const rawRows = (result.values || []);
   const headers = rawRows.shift();
 
   rawRows.forEach((row) => {
