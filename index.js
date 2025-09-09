@@ -23,9 +23,10 @@ async function handleRequest(event) {
     return error("URL format is /spreadsheet_id/sheet_name", 404);
   }
 
-  const cacheKey = `https://opensheet.elk.sh/${id}/${encodeURIComponent(
-    sheet
-  )}`;
+  const useUnformattedValues = url.searchParams.get("raw") === "true";
+
+  const cacheKey = `https://opensheet.elk.sh/${id}/${encodeURIComponent(sheet)}?raw=${useUnformattedValues}`;
+
   const cache = caches.default;
   const cachedResponse = await cache.match(cacheKey);
   if (cachedResponse) {
@@ -62,13 +63,11 @@ async function handleRequest(event) {
     sheet = sheetWithThisIndex.properties.title;
   }
 
-  const result = await (
-    await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
-        sheet
-      )}?key=${GOOGLE_API_KEY}`
-    )
-  ).json();
+  const apiUrl = new URL(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(sheet)}`);
+  apiUrl.searchParams.set("key", GOOGLE_API_KEY);
+  if (useUnformattedValues) apiUrl.searchParams.set("valueRenderOption", "UNFORMATTED_VALUE");
+
+  const result = await (await fetch(apiUrl)).json();
 
   if (result.error) {
     return error(result.error.message);

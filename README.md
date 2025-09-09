@@ -39,6 +39,8 @@ https://opensheet.elk.sh/1o5t26He2DzTweYeleXOGiDjlU4Jkx896f95VUHVgS8U/1
 
 _Take note that the first sheet in order is numbered `1`, not `0`._
 
+Adding the `?raw=true` URL parameter returns the raw, unformatted data from the sheet. Without this parameter, Google Sheets formats numbers, dates, and other data types, but with `?raw=true`, you'll get the underlying values.
+
 ## Caching
 
 Responses are cached for 30 seconds in order to improve performance and to avoid hitting Google Sheets’ rate limits, so it might take up to 30 seconds for fresh edits to show up in the API response.
