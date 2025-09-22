@@ -20,7 +20,8 @@ export default {
       return error("URL format is /spreadsheet_id/sheet_name", 404);
     }
 
-    if (env.DB) {
+    // 1% sampling to decrease load on D1
+    if (env.DB && Math.random() < 0.01) {
       const now = new Date();
       const hour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours()).toISOString();
 
