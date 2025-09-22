@@ -8,3 +8,9 @@ compatibility_date = "2022-11-20"
 
 # For custom domain — comment out if you don’t have a custom domain.
 route = "opensheet.elk.sh/*"
+
+# For analytics - comment if you don't want to set up a D1 database and collect analytics
+[[d1_databases]]
+binding = "DB"
+database_name = "analytics"
+database_id = "7dde905e-a654-4497-9e54-4b51ce5ac6fd"
