@@ -20,6 +20,19 @@ export default {
       return error("URL format is /spreadsheet_id/sheet_name", 404);
     }
 
+    if (env.DB) {
+      const now = new Date();
+      const hour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours()).toISOString();
+
+      env.DB.prepare(`
+        INSERT INTO analytics (hour, sheet_id, count)
+        VALUES (?, ?, 1)
+        ON CONFLICT (hour, sheet_id)
+        DO UPDATE SET count = count + 1
+      `).bind(hour, id).run();
+    }
+
+
     const useUnformattedValues = url.searchParams.get("raw") === "true";
 
     const cacheKey = `https://opensheet.elk.sh/${id}/${encodeURIComponent(sheet)}?raw=${useUnformattedValues}`;
