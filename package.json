@@ -3,11 +3,12 @@
   "main": "index.js",
   "scripts": {
     "dev": "wrangler dev",
+    "dev:remote": "wrangler dev --remote",
     "deploy": "wrangler deploy",
     "add-env-variables": "wrangler secret put GOOGLE_API_KEY"
   },
   "author": "Ben Borgers <benborgers@hey.com>",
   "devDependencies": {
-    "wrangler": "^3.37.0"
+    "wrangler": "^4.38.0"
   }
 }
