@@ -54,7 +54,7 @@ const server = Bun.serve({
       const useUnformattedValues = queryParams.raw === "true";
 
       // 1% sampling to decrease load on database
-      if (Math.random() < 1) {
+      if (Math.random() < 0.01) {
         const now = new Date();
         const hour = new Date(
           now.getFullYear(),
