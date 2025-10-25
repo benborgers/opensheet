@@ -1,4 +1,4 @@
-import Bun, { sql } from "bun";
+import Bun, { redis, sql } from "bun";
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
@@ -52,6 +52,15 @@ const server = Bun.serve({
       }
 
       const useUnformattedValues = queryParams.raw === "true";
+
+      const cacheKey = request.url;
+
+      const cachedResponse = await redis.get(cacheKey);
+      if (cachedResponse) {
+        return new Response(cachedResponse, {
+          headers: HEADERS,
+        });
+      }
 
       // 1% sampling to decrease load on database
       if (Math.random() < 0.01) {
@@ -127,6 +136,9 @@ const server = Bun.serve({
       });
 
       const responseData = JSON.stringify(rows);
+
+      await redis.set(cacheKey, responseData);
+      await redis.expire(cacheKey, 30);
 
       return new Response(responseData, {
         headers: HEADERS,
