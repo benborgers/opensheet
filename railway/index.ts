@@ -143,6 +143,7 @@ const error = (message: string, status = 400) => {
     status: status,
     headers: {
       "Content-Type": "application/json",
+      "Cache-Control": "public, max-age=30, s-maxage=30",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Headers":
         "Origin, X-Requested-With, Content-Type, Accept",
