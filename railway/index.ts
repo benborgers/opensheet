@@ -6,6 +6,14 @@ const ALLOWED_QUERY_PARAMETERS = {
   raw: ["true", "false"],
 };
 
+const HEADERS = {
+  "Content-Type": "application/json",
+  "Cache-Control": "public, max-age=30, s-maxage=30",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "Origin, X-Requested-With, Content-Type, Accept",
+};
+
 const server = Bun.serve({
   port: process.env.PORT || 3000,
   routes: {
@@ -121,13 +129,7 @@ const server = Bun.serve({
       const responseData = JSON.stringify(rows);
 
       return new Response(responseData, {
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "public, max-age=30, s-maxage=30",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Headers":
-            "Origin, X-Requested-With, Content-Type, Accept",
-        },
+        headers: HEADERS,
       });
     },
   },
@@ -141,12 +143,6 @@ console.log(`Server running on http://localhost:${server.port}`);
 const error = (message: string, status = 400) => {
   return new Response(JSON.stringify({ error: message }), {
     status: status,
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "public, max-age=30, s-maxage=30",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers":
-        "Origin, X-Requested-With, Content-Type, Accept",
-    },
+    headers: HEADERS,
   });
 };
