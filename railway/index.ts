@@ -2,6 +2,10 @@ import Bun from "bun";
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
+const ALLOWED_QUERY_PARAMETERS = {
+  raw: ["true", "false"],
+};
+
 const server = Bun.serve({
   port: process.env.PORT || 3000,
   routes: {
@@ -10,6 +14,36 @@ const server = Bun.serve({
     "/:id/:sheet": async (request) => {
       const { id, sheet: sheetParam } = request.params;
       const url = new URL(request.url);
+
+      const queryParams = Object.fromEntries(url.searchParams.entries());
+
+      // This prevents use of extra query parameters like ?v= to bust the cache early.
+      if (
+        Object.keys(queryParams).some(
+          (key) => !(key in ALLOWED_QUERY_PARAMETERS)
+        )
+      ) {
+        return error(
+          `Invalid query parameters. Allowed parameters: ${Object.keys(
+            ALLOWED_QUERY_PARAMETERS
+          )
+            .map((key) => `\`${key}\``)
+            .join(", ")}`,
+          400
+        );
+      }
+
+      // This prevents the use of the `raw` parameter to bust the cache.
+      for (const [key, value] of Object.entries(queryParams)) {
+        if (key in ALLOWED_QUERY_PARAMETERS) {
+          const allowedValues = ALLOWED_QUERY_PARAMETERS[key];
+          if (!allowedValues.includes(value)) {
+            return error(`Invalid value for query parameter \`${key}\``, 400);
+          }
+        }
+      }
+
+      const useUnformattedValues = queryParams.raw === "true";
 
       // 1% sampling to decrease load on database
       if (Math.random() < 0.01) {
@@ -28,8 +62,6 @@ const server = Bun.serve({
         //   DO UPDATE SET count = analytics.count + 1
         // `;
       }
-
-      const useUnformattedValues = url.searchParams.get("raw") === "true";
 
       let sheet = decodeURIComponent(sheetParam.replace(/\+/g, " "));
 
