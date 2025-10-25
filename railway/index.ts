@@ -91,8 +91,7 @@ const server = Bun.serve({
       return new Response(responseData, {
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "public, max-age=30",
-          "CDN-Cache-Control": "max-age=30",
+          "Cache-Control": "public, max-age=30, s-maxage=30",
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Headers":
             "Origin, X-Requested-With, Content-Type, Accept",
