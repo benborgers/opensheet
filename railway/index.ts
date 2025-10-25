@@ -1,4 +1,4 @@
-import { sql } from "bun";
+import Bun from "bun";
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
@@ -21,12 +21,12 @@ const server = Bun.serve({
           now.getHours()
         ).toISOString();
 
-        await sql`
-          INSERT INTO analytics (hour, sheet_id, count)
-          VALUES (${hour}, ${id}, 1)
-          ON CONFLICT (hour, sheet_id)
-          DO UPDATE SET count = analytics.count + 1
-        `;
+        // await sql`
+        //   INSERT INTO analytics (hour, sheet_id, count)
+        //   VALUES (${hour}, ${id}, 1)
+        //   ON CONFLICT (hour, sheet_id)
+        //   DO UPDATE SET count = analytics.count + 1
+        // `;
       }
 
       const useUnformattedValues = url.searchParams.get("raw") === "true";
