@@ -141,8 +141,14 @@ const server = Bun.serve({
 console.log(`Server running on http://localhost:${server.port}`);
 
 const error = (message: string, status = 400) => {
-  return new Response(JSON.stringify({ error: message }), {
-    status: status,
-    headers: HEADERS,
-  });
+  return new Response(
+    JSON.stringify({
+      error: message,
+      documentation: "https://github.com/benborgers/opensheet#readme",
+    }),
+    {
+      status: status,
+      headers: HEADERS,
+    }
+  );
 };
