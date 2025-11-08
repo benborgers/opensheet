@@ -6,9 +6,8 @@ const ALLOWED_QUERY_PARAMETERS = {
   raw: ["true", "false"],
 };
 
-const HEADERS = {
+const BASE_HEADERS = {
   "Content-Type": "application/json",
-  "Cache-Control": "public, max-age=30, s-maxage=30",
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "Origin, X-Requested-With, Content-Type, Accept",
@@ -22,6 +21,13 @@ const server = Bun.serve({
     "/:id/:sheet": async (request) => {
       const { id, sheet: sheetParam } = request.params;
       const url = new URL(request.url);
+
+      // Random cache duration between 30-40 seconds to prevent cache stampedes
+      const cacheDuration = Math.floor(Math.random() * 11) + 30; // 30 to 40 seconds
+      const HEADERS = {
+        ...BASE_HEADERS,
+        "Cache-Control": `public, max-age=${cacheDuration}, s-maxage=${cacheDuration}`,
+      };
 
       const queryParams = Object.fromEntries(url.searchParams.entries());
 
@@ -138,7 +144,7 @@ const server = Bun.serve({
       const responseData = JSON.stringify(rows);
 
       await redis.set(cacheKey, responseData);
-      await redis.expire(cacheKey, 30);
+      await redis.expire(cacheKey, cacheDuration);
 
       return new Response(responseData, {
         headers: HEADERS,
@@ -160,7 +166,10 @@ const error = (message: string, status = 400) => {
     }),
     {
       status: status,
-      headers: HEADERS,
+      headers: {
+        ...BASE_HEADERS,
+        "Cache-Control": "public, max-age=30, s-maxage=30",
+      },
     }
   );
 };
