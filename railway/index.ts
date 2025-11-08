@@ -195,6 +195,7 @@ const server = Bun.serve({
 console.log(`Server running on http://localhost:${server.port}`);
 
 const error = (message: string, status = 400) => {
+  console.log(status, message);
   return new Response(
     JSON.stringify({
       error: message,
