@@ -22,8 +22,8 @@ const server = Bun.serve({
       const { id, sheet: sheetParam } = request.params;
       const url = new URL(request.url);
 
-      // Random cache duration between 30-40 seconds to prevent cache stampedes
-      const cacheDuration = Math.floor(Math.random() * 11) + 30; // 30 to 40 seconds
+      // Random cache duration between 30-60 seconds to prevent cache stampedes
+      const cacheDuration = Math.floor(Math.random() * 31) + 30; // 30 to 60 seconds
       const HEADERS = {
         ...BASE_HEADERS,
         "Cache-Control": `public, max-age=${cacheDuration}, s-maxage=${cacheDuration}`,
