@@ -6,6 +6,9 @@ const ALLOWED_QUERY_PARAMETERS = {
   raw: ["true", "false"],
 };
 
+// In-memory cache for pending requests to prevent thundering herd
+const pendingRequests = new Map<string, Promise<string>>();
+
 const BASE_HEADERS = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
@@ -68,94 +71,116 @@ const server = Bun.serve({
         });
       }
 
-      // 1% sampling to decrease load on database
-      if (Math.random() < 0.01) {
-        const now = new Date();
-        const hour = new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          now.getDate(),
-          now.getHours()
-        ).toISOString();
-
-        await sql`
-          INSERT INTO analytics (hour, sheet_id, count)
-          VALUES (${hour}, ${id}, 1)
-          ON CONFLICT (hour, sheet_id)
-          DO UPDATE SET count = analytics.count + 1
-        `;
+      // Check if there's already a pending request for this cache key
+      // This prevents multiple simultaneous requests from all hitting the Google API
+      if (pendingRequests.has(cacheKey)) {
+        const responseData = await pendingRequests.get(cacheKey)!;
+        return new Response(responseData, {
+          headers: HEADERS,
+        });
       }
 
-      let sheet = decodeURIComponent(sheetParam.replace(/\+/g, " "));
+      // Create a promise for fetching this data and store it
+      const fetchPromise = (async () => {
+        try {
+          // 1% sampling to decrease load on database
+          if (Math.random() < 0.01) {
+            const now = new Date();
+            const hour = new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate(),
+              now.getHours()
+            ).toISOString();
 
-      if (!isNaN(sheet as any)) {
-        if (parseInt(sheet) === 0) {
-          return error("For this API, sheet numbers start at 1");
-        }
-
-        const metadataCacheKey = `metadata:${id}`;
-        const cachedMetadata = await redis.get(metadataCacheKey);
-
-        let sheetData;
-        if (cachedMetadata) {
-          sheetData = JSON.parse(cachedMetadata);
-        } else {
-          sheetData = await (
-            await fetch(
-              `https://sheets.googleapis.com/v4/spreadsheets/${id}?key=${GOOGLE_API_KEY}`
-            )
-          ).json();
-
-          if (sheetData.error) {
-            return error(sheetData.error.message);
+            await sql`
+              INSERT INTO analytics (hour, sheet_id, count)
+              VALUES (${hour}, ${id}, 1)
+              ON CONFLICT (hour, sheet_id)
+              DO UPDATE SET count = analytics.count + 1
+            `;
           }
 
-          await redis.set(metadataCacheKey, JSON.stringify(sheetData));
-          await redis.expire(metadataCacheKey, 300);
+          let sheet = decodeURIComponent(sheetParam.replace(/\+/g, " "));
+
+          if (!isNaN(sheet as any)) {
+            if (parseInt(sheet) === 0) {
+              throw new Error("For this API, sheet numbers start at 1");
+            }
+
+            const metadataCacheKey = `metadata:${id}`;
+            const cachedMetadata = await redis.get(metadataCacheKey);
+
+            let sheetData;
+            if (cachedMetadata) {
+              sheetData = JSON.parse(cachedMetadata);
+            } else {
+              sheetData = await (
+                await fetch(
+                  `https://sheets.googleapis.com/v4/spreadsheets/${id}?key=${GOOGLE_API_KEY}`
+                )
+              ).json();
+
+              if (sheetData.error) {
+                throw new Error(sheetData.error.message);
+              }
+
+              await redis.set(metadataCacheKey, JSON.stringify(sheetData));
+              await redis.expire(metadataCacheKey, 300);
+            }
+
+            const sheetIndex = parseInt(sheet) - 1;
+            const sheetWithThisIndex = sheetData.sheets[sheetIndex];
+
+            if (!sheetWithThisIndex) {
+              throw new Error(`There is no sheet number ${sheet}`);
+            }
+
+            sheet = sheetWithThisIndex.properties.title;
+          }
+
+          const apiUrl = new URL(
+            `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
+              sheet
+            )}`
+          );
+          apiUrl.searchParams.set("key", GOOGLE_API_KEY!);
+          if (useUnformattedValues)
+            apiUrl.searchParams.set("valueRenderOption", "UNFORMATTED_VALUE");
+
+          const result = await (await fetch(apiUrl)).json();
+
+          if (result.error) {
+            throw new Error(result.error.message);
+          }
+
+          const rows: any[] = [];
+
+          const rawRows = result.values || [];
+          const headers = rawRows.shift();
+
+          rawRows.forEach((row: any[]) => {
+            const rowData: any = {};
+            row.forEach((item, index) => {
+              rowData[headers[index]] = item;
+            });
+            rows.push(rowData);
+          });
+
+          const responseData = JSON.stringify(rows);
+
+          await redis.set(cacheKey, responseData);
+          await redis.expire(cacheKey, cacheDuration);
+
+          return responseData;
+        } finally {
+          // Always remove from pending requests when done
+          pendingRequests.delete(cacheKey);
         }
+      })();
 
-        const sheetIndex = parseInt(sheet) - 1;
-        const sheetWithThisIndex = sheetData.sheets[sheetIndex];
-
-        if (!sheetWithThisIndex) {
-          return error(`There is no sheet number ${sheet}`);
-        }
-
-        sheet = sheetWithThisIndex.properties.title;
-      }
-
-      const apiUrl = new URL(
-        `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(
-          sheet
-        )}`
-      );
-      apiUrl.searchParams.set("key", GOOGLE_API_KEY!);
-      if (useUnformattedValues)
-        apiUrl.searchParams.set("valueRenderOption", "UNFORMATTED_VALUE");
-
-      const result = await (await fetch(apiUrl)).json();
-
-      if (result.error) {
-        return error(result.error.message);
-      }
-
-      const rows: any[] = [];
-
-      const rawRows = result.values || [];
-      const headers = rawRows.shift();
-
-      rawRows.forEach((row: any[]) => {
-        const rowData: any = {};
-        row.forEach((item, index) => {
-          rowData[headers[index]] = item;
-        });
-        rows.push(rowData);
-      });
-
-      const responseData = JSON.stringify(rows);
-
-      await redis.set(cacheKey, responseData);
-      await redis.expire(cacheKey, cacheDuration);
+      pendingRequests.set(cacheKey, fetchPromise);
+      const responseData = await fetchPromise;
 
       return new Response(responseData, {
         headers: HEADERS,
