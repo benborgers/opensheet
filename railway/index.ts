@@ -93,14 +93,25 @@ const server = Bun.serve({
           return error("For this API, sheet numbers start at 1");
         }
 
-        const sheetData = await (
-          await fetch(
-            `https://sheets.googleapis.com/v4/spreadsheets/${id}?key=${GOOGLE_API_KEY}`
-          )
-        ).json();
+        const metadataCacheKey = `metadata:${id}`;
+        const cachedMetadata = await redis.get(metadataCacheKey);
 
-        if (sheetData.error) {
-          return error(sheetData.error.message);
+        let sheetData;
+        if (cachedMetadata) {
+          sheetData = JSON.parse(cachedMetadata);
+        } else {
+          sheetData = await (
+            await fetch(
+              `https://sheets.googleapis.com/v4/spreadsheets/${id}?key=${GOOGLE_API_KEY}`
+            )
+          ).json();
+
+          if (sheetData.error) {
+            return error(sheetData.error.message);
+          }
+
+          await redis.set(metadataCacheKey, JSON.stringify(sheetData));
+          await redis.expire(metadataCacheKey, 300);
         }
 
         const sheetIndex = parseInt(sheet) - 1;
