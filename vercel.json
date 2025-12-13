@@ -1,3 +1,12 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
+  "routes": [
+    {
+      "src": "/(.*)",
+      "status": 308,
+      "headers": {
+        "Location": "https://opensheet.elk.sh/$1",
+        "Access-Control-Allow-Origin": "*"
+      }
+    }
+  ]
 }
