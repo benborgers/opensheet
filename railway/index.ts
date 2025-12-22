@@ -180,11 +180,15 @@ const server = Bun.serve({
       })();
 
       pendingRequests.set(cacheKey, fetchPromise);
-      const responseData = await fetchPromise;
 
-      return new Response(responseData, {
-        headers: HEADERS,
-      });
+      try {
+        const responseData = await fetchPromise;
+        return new Response(responseData, {
+          headers: HEADERS,
+        });
+      } catch (e) {
+        return error(e instanceof Error ? e.message : String(e));
+      }
     },
   },
   fetch() {
