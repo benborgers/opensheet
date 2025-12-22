@@ -74,10 +74,14 @@ const server = Bun.serve({
       // Check if there's already a pending request for this cache key
       // This prevents multiple simultaneous requests from all hitting the Google API
       if (pendingRequests.has(cacheKey)) {
-        const responseData = await pendingRequests.get(cacheKey)!;
-        return new Response(responseData, {
-          headers: HEADERS,
-        });
+        try {
+          const responseData = await pendingRequests.get(cacheKey)!;
+          return new Response(responseData, {
+            headers: HEADERS,
+          });
+        } catch (e) {
+          return error(e instanceof Error ? e.message : String(e));
+        }
       }
 
       // Create a promise for fetching this data and store it
