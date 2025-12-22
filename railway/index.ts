@@ -45,7 +45,7 @@ const server = Bun.serve({
             ALLOWED_QUERY_PARAMETERS
           )
             .map((key) => `\`${key}\``)
-            .join(", ")}`,
+            .join(", ")}. Your request was: ${request.url}`,
           400
         );
       }
