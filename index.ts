@@ -21,7 +21,7 @@ const server = Bun.serve({
   routes: {
     "/": Response.redirect("https://github.com/benborgers/opensheet#readme"),
 
-    "/up": () => new Response("OK", { status: 200 }),
+    "/up": Response.redirect("/1o5t26He2DzTweYeleXOGiDjlU4Jkx896f95VUHVgS8U/Test+Sheet"),
 
     "/:id/:sheet": async (request) => {
       const { id, sheet: sheetParam } = request.params;
