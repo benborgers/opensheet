@@ -4,3 +4,5 @@ dist
 worker
 .env
 .wrangler
+.kamal/secrets
+.kamal/secrets.*

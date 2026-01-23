@@ -1,0 +1,49 @@
+service: opensheet
+
+image: benborgers/opensheet
+
+servers:
+  - 91.99.93.200
+
+registry:
+  username: benborgers
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+
+proxy:
+  host: opensheet-kamal.elk.sh
+  app_port: 3000
+  healthcheck:
+    path: /up
+
+env:
+  clear:
+    BUN_REDIS_URL: redis://opensheet-redis:6379
+    BUN_POSTGRES_URL: postgres://opensheet:$POSTGRES_PASSWORD@opensheet-db:5432/opensheet
+  secret:
+    - GOOGLE_API_KEY
+    - POSTGRES_PASSWORD
+
+accessories:
+  db:
+    image: postgres:16
+    host: 91.99.93.200
+    port: "127.0.0.1:5432:5432"
+    env:
+      clear:
+        POSTGRES_USER: opensheet
+        POSTGRES_DB: opensheet
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    host: 91.99.93.200
+    port: "127.0.0.1:6379:6379"
+    directories:
+      - data:/data
