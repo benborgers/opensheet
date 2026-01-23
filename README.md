@@ -1,6 +1,6 @@
 # opensheet
 
-#### opensheet's servers get 650,000,000 hits each month! <br /> If the project is is useful to you, I'd love your help in covering hosting costs. <br /> You can [sponsor me for $3/month on GitHub Sponsors](https://github.com/sponsors/benborgers). Thank you!
+#### opensheet's servers get 1.5 billion hits each month! <br /> If the project is is useful to you, I'd love your help in covering hosting costs. <br /> You can [sponsor me for $3/month on GitHub Sponsors](https://github.com/sponsors/benborgers). Thank you!
 
 ---
 
