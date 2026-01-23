@@ -16,6 +16,7 @@ builder:
 proxy:
   host: opensheet-kamal.elk.sh
   app_port: 3000
+  ssl: true
   healthcheck:
     path: /up
 
