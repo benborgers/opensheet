@@ -14,7 +14,9 @@ builder:
   arch: amd64
 
 proxy:
-  host: opensheet-kamal.elk.sh
+  hosts:
+    - opensheet-kamal.elk.sh
+    - opensheet.elk.sh
   app_port: 3000
   ssl: true
   healthcheck:
