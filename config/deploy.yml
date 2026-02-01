@@ -22,7 +22,7 @@ proxy:
 
 env:
   clear:
-    BUN_REDIS_URL: redis://redis:6379
+    BUN_REDIS_URL: redis://opensheet-redis:6379
     BUN_POSTGRES_URL: postgres://opensheet:$POSTGRES_PASSWORD@opensheet-db:5432/opensheet
   secret:
     - GOOGLE_API_KEY
