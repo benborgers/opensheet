@@ -89,8 +89,7 @@ const server = Bun.serve({
       // Create a promise for fetching this data and store it
       const fetchPromise = (async () => {
         try {
-          // 100% sampling for testing (normally 1%)
-          if (Math.random() < 1) {
+          if (Math.random() < 0.01) {
             const now = new Date();
             const hour = new Date(
               now.getFullYear(),
