@@ -3,7 +3,7 @@ service: opensheet
 image: benborgers/opensheet
 
 servers:
-  - 91.99.93.200
+  - 89.167.18.108
 
 registry:
   username: benborgers
@@ -31,7 +31,7 @@ env:
 accessories:
   db:
     image: postgres:16
-    host: 91.99.93.200
+    host: 89.167.18.108
     port: "127.0.0.1:5432:5432"
     env:
       clear:
@@ -44,7 +44,7 @@ accessories:
 
   redis:
     image: redis:7
-    host: 91.99.93.200
+    host: 89.167.18.108
     port: "127.0.0.1:6379:6379"
     directories:
       - data:/data
