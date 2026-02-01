@@ -22,7 +22,7 @@ proxy:
 
 env:
   clear:
-    BUN_REDIS_URL: redis://opensheet-redis:6379
+    REDIS_URL: redis://opensheet-redis:6379
     PGHOST: opensheet-db
     PGPORT: "5432"
     PGDATABASE: opensheet
