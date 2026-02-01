@@ -23,10 +23,13 @@ proxy:
 env:
   clear:
     BUN_REDIS_URL: redis://opensheet-redis:6379
-    BUN_POSTGRES_URL: postgres://opensheet:$POSTGRES_PASSWORD@opensheet-db:5432/opensheet
+    PGHOST: opensheet-db
+    PGPORT: "5432"
+    PGDATABASE: opensheet
+    PGUSER: opensheet
   secret:
     - GOOGLE_API_KEY
-    - POSTGRES_PASSWORD
+    - PGPASSWORD
 
 accessories:
   db:
